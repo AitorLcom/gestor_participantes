@@ -12,9 +12,14 @@ from opciones import vista_configuracion
 
 @st.cache_resource
 def conectar_google_sheets():
-    scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-    cred_path = Path(__file__).parent / "credenciales.json"
-    creds = ServiceAccountCredentials.from_json_keyfile_name(str(cred_path), scope)
+    import json
+    from google.oauth2.service_account import Credentials
+
+    creds_dict = json.loads(st.secrets["GOOGLE_CREDENTIALS"])
+    creds = Credentials.from_service_account_info(creds_dict, scopes=[
+        "https://spreadsheets.google.com/feeds",
+        "https://www.googleapis.com/auth/drive"
+    ])
     client = gspread.authorize(creds)
     sheet = client.open("asignador_dbs")
     return sheet
